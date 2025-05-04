@@ -110,7 +110,6 @@ export async function groupCreatedTab(tab) {
     const tabs = await browser.tabs.query({ currentWindow: true });
     console.log(`Found ${tabs.length} tabs in the current window.`);
 
-    // Ungroup any currently grouped tabs in this window first
     const tabIdsToUngroup = tabs
       .filter((t) => t.groupId !== -1)
       .map((t) => t.id);
@@ -129,7 +128,6 @@ export async function groupCreatedTab(tab) {
       console.log("No tabs were previously grouped. Skipping ungroup step.");
     }
 
-    // Create a map to hold tab IDs grouped by domain
     const domainMap = new Map();
 
     for (const t of tabs) {
@@ -154,9 +152,6 @@ export async function groupCreatedTab(tab) {
           `Attempting to group ${tabIds.length} tabs for domain: ${domain}`,
         );
         try {
-          // Create a new group for these tabs
-          // Note: The group will NOT be automatically named after the domain with this version
-          const groupId = await browser.tabs.group({ tabIds: tabIds });
           console.log(
             `Created new group with ID: ${groupId} for ${domain} tabs (manual renaming required).`,
           );
@@ -164,9 +159,6 @@ export async function groupCreatedTab(tab) {
           await browser.tabGroups.update(groupId, {
             title: domain,
           });
-
-          // *** REMOVED: browser.tabGroups.update call ***
-          // This is the line removed to avoid the error you reported
         } catch (groupErr) {
           console.error(
             `Error grouping tabs for domain "${domain}":`,
@@ -184,7 +176,6 @@ export async function groupCreatedTab(tab) {
   }
 }
 
-// Helper function to extract the domain (hostname) from a URL
 function getDomain(url) {
   try {
     const urlObject = new URL(url);
