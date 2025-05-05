@@ -17,6 +17,19 @@ browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   }
 });
 
+browser.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+  const tabs = await browser.tabs.query({ currentWindow: true });
+  let domainMap = createDomainMap(tabs);
+  for (const [domain, tabIds] of domainMap.entries()) {
+    if (tabIds.includes(tabId)) {
+      var tabsToUngroup = tabIds.filter((id) => id !== tabId);
+      if (tabsToUngroup.length <= 1) {
+        await browser.tabs.ungroup(tabsToUngroup);
+      }
+    }
+  }
+});
+
 async function groupAllTabs() {
   if (
     !browser.tabs ||
