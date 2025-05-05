@@ -151,7 +151,7 @@ async function groupCreatedTab(tab) {
       const groupId = await browser.tabs.group({
         tabIds: tabIds,
       });
-      const tabGroupTitle = await browser.tabGroups.get(tab.groupId).title;
+      const tabGroupTitle = await browser.tabGroups.get(groupId).title;
       if (tabGroupTitle !== domain) {
         await browser.tabGroups.update(groupId, {
           title: domain,
