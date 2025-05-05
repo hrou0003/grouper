@@ -56,17 +56,7 @@ async function groupAllTabs() {
     }
 
     // Create a map to hold tab IDs grouped by domain
-    const domainMap = new Map();
-
-    for (const t of tabs) {
-      const domain = getDomain(t.url);
-      if (domain) {
-        if (!domainMap.has(domain)) {
-          domainMap.set(domain, []);
-        }
-        domainMap.get(domain).push(t.id);
-      }
-    }
+    let domainMap = createDomainMap(tabs);
 
     console.log(
       `Identified ${domainMap.size} unique domains with groupable tabs.`,
@@ -125,10 +115,16 @@ async function groupCreatedTab(tab) {
 
   try {
     const domain = getDomain(tab.url);
-    console.log(domain);
-    const groups = await browser.tabGroups.query({ title: domain });
+
+    const groups = await browser.tabGroups.query({
+      title: domain,
+      windowId: tab.windowId,
+    });
     let existingGroupId = groups.length > 0 ? groups[0].id : null;
-    console.log(existingGroupId);
+
+    const tabs = await browser.tabs.query({ currentWindow: true });
+    let domainMap = createDomainMap(tabs);
+
     if (existingGroupId) {
       console.log(
         `Found existing group for domain: ${domain}, Id: ${existingGroupId}`,
@@ -137,9 +133,10 @@ async function groupCreatedTab(tab) {
         groupId: existingGroupId,
         tabIds: [tab.id],
       });
-    } else {
+    } else if (domainMap.get(domain).length > 1) {
+      let tabIds = domainMap.get(domain);
       const groupId = await browser.tabs.group({
-        tabIds: [tab.id],
+        tabIds: tabIds,
       });
       const tabGroupTitle = await browser.tabGroups.get(tab.groupId).title;
       if (tabGroupTitle !== domain) {
@@ -147,10 +144,28 @@ async function groupCreatedTab(tab) {
           title: domain,
         });
       }
+    } else {
+      browser.tabs.ungroup([tab.id]);
     }
   } catch (error) {
     console.error("An unexpected error occurred during tab grouping:", error);
   }
+}
+
+function createDomainMap(tabs) {
+  const domainMap = new Map();
+
+  for (const t of tabs) {
+    const domain = getDomain(t.url);
+    if (domain) {
+      if (!domainMap.has(domain)) {
+        domainMap.set(domain, []);
+      }
+      domainMap.get(domain).push(t.id);
+    }
+  }
+
+  return domainMap;
 }
 
 // Helper function to extract the domain (hostname) from a URL
