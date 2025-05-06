@@ -84,7 +84,6 @@ async function groupAllTabs() {
         );
         try {
           // Create a new group for these tabs
-          // Note: The group will NOT be automatically named after the domain with this version
           const groupId = await browser.tabs.group({ tabIds: tabIds });
           console.log(
             `Created new group with ID: ${groupId} for ${domain} tabs (manual renaming required).`,
@@ -93,9 +92,6 @@ async function groupAllTabs() {
           await browser.tabGroups.update(groupId, {
             title: domain,
           });
-
-          // *** REMOVED: browser.tabGroups.update call ***
-          // This is the line removed to avoid the error you reported
         } catch (groupErr) {
           console.error(
             `Error grouping tabs for domain "${domain}":`,
