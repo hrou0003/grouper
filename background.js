@@ -1,7 +1,4 @@
-// Listen for clicks on the browser action button
 browser.action.onClicked.addListener(async (tab) => {
-  // Basic check if the necessary core tab grouping APIs are available
-  // We remove the tabGroups check here
   await groupAllTabs();
 });
 
@@ -49,7 +46,6 @@ async function groupAllTabs() {
     const tabs = await browser.tabs.query({ currentWindow: true });
     console.log(`Found ${tabs.length} tabs in the current window.`);
 
-    // Ungroup any currently grouped tabs in this window first
     const tabIdsToUngroup = tabs
       .filter((t) => t.groupId !== -1)
       .map((t) => t.id);
@@ -177,7 +173,6 @@ function createDomainMap(tabs) {
   return domainMap;
 }
 
-// Helper function to extract the domain (hostname) from a URL
 function getDomain(url) {
   try {
     const urlObject = new URL(url);
