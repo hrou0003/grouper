@@ -64,22 +64,18 @@ async function groupAllTabs() {
       console.log("No tabs were previously grouped. Skipping ungroup step.");
     }
 
-    // Create a map to hold tab IDs grouped by domain
     let domainMap = createDomainMap(tabs);
 
     console.log(
       `Identified ${domainMap.size} unique domains with groupable tabs.`,
     );
 
-    // Iterate through the domain map and create groups
     for (const [domain, tabIds] of domainMap.entries()) {
-      // Only group if there's more than one tab for this domain
       if (tabIds.length > 1) {
         console.log(
           `Attempting to group ${tabIds.length} tabs for domain: ${domain}`,
         );
         try {
-          // Create a new group for these tabs
           const groupId = await browser.tabs.group({ tabIds: tabIds });
           console.log(
             `Created new group with ID: ${groupId} for ${domain} tabs (manual renaming required).`,
