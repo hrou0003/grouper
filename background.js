@@ -37,6 +37,7 @@ async function groupAllTabs() {
     console.error(
       "Basic tab grouping APIs (tabs.group/ungroup) are not available in this Firefox version or environment.",
     );
+
     return;
   }
 
