@@ -42,8 +42,6 @@ async function groupAllTabs() {
   }
 
   try {
-    console.log("Starting tab grouping...");
-
     const tabs = await browser.tabs.query({ currentWindow: true });
     console.log(`Found ${tabs.length} tabs in the current window.`);
 
